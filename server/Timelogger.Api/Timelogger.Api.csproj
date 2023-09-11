@@ -5,7 +5,14 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Timelogger\Timelogger.csproj" />
+    <ProjectReference Include="..\Timelogger.App\Timelogger.App.csproj" />
+    <ProjectReference Include="..\Timelogger.Domain\Timelogger.Domain.csproj" />
+    <ProjectReference Include="..\Timelogger.Repository\Timelogger.Repository.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
   </ItemGroup>
 
 </Project>

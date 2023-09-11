@@ -5,7 +5,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
-using Timelogger.Entities;
+using Timelogger.App.Features;
+using Timelogger.App.Interfaces;
+using Timelogger.MappingProfiles;
+using Timelogger.Repository;
+using Timelogger.Repository.Interfaces;
+using Timelogger.Repository.Repositories;
 
 namespace Timelogger.Api
 {
@@ -30,13 +35,24 @@ namespace Timelogger.Api
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Add framework services.
-			services.AddDbContext<ApiContext>(opt => opt.UseInMemoryDatabase("e-conomic interview"));
+			services.AddDbContext<DBContext>(opt => opt.UseInMemoryDatabase("e-conomic interview"));
 			services.AddLogging(builder =>
 			{
 				builder.AddConsole();
 				builder.AddDebug();
 			});
+			services.AddAutoMapper(typeof(ProjectProfile));
+			services.AddAutoMapper(typeof(TimeRegistrationProfile));
+			
+			// Register handlers
+			services.AddTransient<IGetProjectsHandler, GetProjectsHandler>();
+			services.AddTransient<IGetProjectHandler, GetProjectHandler>();
+			services.AddTransient<ICreateTimeRegistrationHandler, CreateTimeRegistrationHandler>();
 
+			// Register repositories
+			services.AddTransient<IProjectRepository, ProjectRepository>();
+			services.AddTransient<ITimeRegistrationRepository, TimeRegistrationRepository>();
+			
 			services.AddMvc(options => options.EnableEndpointRouting = false);
 
 			if (_environment.IsDevelopment())
@@ -62,23 +78,8 @@ namespace Timelogger.Api
 			var serviceScopeFactory = app.ApplicationServices.GetService<IServiceScopeFactory>();
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				SeedDatabase(scope);
+				DBContext.SeedDatabase(scope);
 			}
-		}
-
-		private static void SeedDatabase(IServiceScope scope)
-		{
-			var context = scope.ServiceProvider.GetService<ApiContext>();
-			var testProject1 = new Project
-			{
-				Id = 1,
-				Name = "e-conomic Interview"
-			};
-
-			context.Projects.Add(testProject1);
-			context.Pr
-
-			context.SaveChanges();
 		}
 	}
 }

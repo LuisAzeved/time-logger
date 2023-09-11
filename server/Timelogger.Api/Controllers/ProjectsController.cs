@@ -1,15 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Timelogger.App.Features;
+using Timelogger.App.Interfaces;
+using Timelogger.DTOs;
+using Timelogger.Repository;
 
 namespace Timelogger.Api.Controllers
 {
 	[Route("api/[controller]")]
 	public class ProjectsController : Controller
 	{
-		private readonly ApiContext _context;
+		private readonly IGetProjectsHandler _getProjectsHandler;
+		private readonly IGetProjectHandler _getProjectHandler;
 
-		public ProjectsController(ApiContext context)
+
+		public ProjectsController(IGetProjectsHandler getProjectsHandler, IGetProjectHandler getProjectHandler)
 		{
-			_context = context;
+			_getProjectsHandler = getProjectsHandler;
+			_getProjectHandler = getProjectHandler;
 		}
 
 		[HttpGet]
@@ -21,9 +28,16 @@ namespace Timelogger.Api.Controllers
 
 		// GET api/projects
 		[HttpGet]
-		public IActionResult Get()
+		public IActionResult GetAll(SortDTO sort)
 		{
-			return Ok(_context.Projects);
+			return Ok(_getProjectsHandler.Handle(sort.SortCriteria, sort.SortFieldName));
+		}
+
+		[HttpGet]
+		[Route("{projectId?}")]
+		public IActionResult GetProject(int projectId)
+		{
+			return Ok(_getProjectHandler.Handle(projectId));
 		}
 	}
 }
